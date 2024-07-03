@@ -1,4 +1,4 @@
-interface Student {
+export interface Student {
     firstName: string;
     lastName: string;
     age: number;
@@ -6,14 +6,14 @@ interface Student {
 }
 
 // Create two students
-let student1: Student = {
+const student1: Student = {
     firstName: "John",
     lastName: "Doe",
     age: 20,
     location: "New York"
 };
 
-let student2: Student = {
+const student2: Student = {
     firstName: "Jane",
     lastName: "Smith",
     age: 22,
@@ -21,35 +21,33 @@ let student2: Student = {
 };
 
 // Array containing the two students
-let studentsList: Student[] = [student1, student2];
+const studentsList: Student[] = [student1, student2];
 
-// Render a table using Vanilla JavaScript
-document.addEventListener("DOMContentLoaded", function () {
-    // Find the container where the table will be appended
-    let container = document.getElementById("students-table");
+// Function to render the students in a table
+export const renderStudentsTable(students: Student[]) {
+  const table = document.createElement('table');
+  
+  // Create table header row
+  const headerRow = table.insertRow();
+  const header1 = document.createElement('th');
+  header1.textContent = 'First Name';
+  headerRow.appendChild(header1);
+  const header2 = document.createElement('th');
+  header2.textContent = 'Location';
+  headerRow.appendChild(header2);
 
-    if (container) {
-        // Create a table element
-        let table = document.createElement("table");
-        table.border = "1";
+  // Iterate over each student and create a row for them
+  students.forEach(student => {
+    const row = table.insertRow();
+    const cell1 = row.insertCell();
+    cell1.textContent = student.firstName;
+    const cell2 = row.insertCell();
+    cell2.textContent = student.location;
+  });
 
-        // Create headers row
-        let headersRow = table.insertRow();
-        let firstNameHeader = headersRow.insertCell();
-        firstNameHeader.textContent = "First Name";
-        let locationHeader = headersRow.insertCell();
-        locationHeader.textContent = "Location";
+  // Append the table to the document body
+  document.body.appendChild(table);
+}
 
-        // Iterate over studentsList and create rows for each student
-        studentsList.forEach(student => {
-            let row = table.insertRow();
-            let firstNameCell = row.insertCell();
-            firstNameCell.textContent = student.firstName;
-            let locationCell = row.insertCell();
-            locationCell.textContent = student.location;
-        });
-
-        // Append the table to the container
-        container.appendChild(table);
-    }
-});
+// Render the table
+renderStudentsTable(studentsList);
