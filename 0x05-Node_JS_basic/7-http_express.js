@@ -1,36 +1,32 @@
 // More complex HTTP server using Express
 const express = require('express');
 const fs = require('fs').promises;
-const countStudents = require('./3-read_file_async');
 
+// Initialize the Express app
 const app = express();
 const port = 1245;
 
-app.get('/', (req, res) => {
-  res.send('Hello Holberton School!');
-});
-
-app.get('/students', async (req, res) => {
-  res.set('Content-Type', 'text/plain');
-  res.write('This is the list of our students\n');
-
-  // Get the path to the CSV file from command-line arguments
-  const databasePath = process.argv[2];
-
+// Function to count students (from 3-read_file_async.js)
+async function countStudents(path) {
   try {
-    // Use countStudents from 3-read_file_async.js
-    await countStudents(databasePath);
+    const data = await fs.readFile(path, 'utf8');
+    const lines = data.trim().split('\n').filter((line) => line.trim() !== '');
+    const header = lines[0].split(',');
+    const rows = lines.slice(1);
+    const indexFirstname = header.indexOf('firstname');
+    const indexField = header.indexOf('field');
 
-    // Read and process the CSV file
-    const data = await fs.readFile(databasePath, 'utf8');
-    const lines = data.trim().split('\n');
-    const rows = lines.slice(1).filter((line) => line.trim() !== '');
+    if (indexFirstname === -1 || indexField === -1) {
+      throw new Error('Invalid database format');
+    }
 
     const studentsByField = {};
     let totalStudents = 0;
 
     rows.forEach((row) => {
-      const [firstname, , , field] = row.split(',');
+      const columns = row.split(',');
+      const firstname = columns[indexFirstname];
+      const field = columns[indexField];
 
       if (field) {
         if (!studentsByField[field]) {
@@ -41,19 +37,41 @@ app.get('/students', async (req, res) => {
       }
     });
 
-    res.write(`Number of students: ${totalStudents}\n`);
+    let result = `Number of students: ${totalStudents}\n`;
     for (const [field, students] of Object.entries(studentsByField)) {
-      res.write(`Number of students in ${field}: ${students.length}. List: ${students.join(', ')}\n`);
+      result += `Number of students in ${field}: ${students.length}. List: ${students.join(', ')}\n`;
     }
-    res.end(); // End the response
+
+    return result.trim();
   } catch (error) {
-    res.write('Cannot load the database\n');
-    res.end();
+    return 'Cannot load the database';
+  }
+}
+
+// Route for the home page
+app.get('/', (req, res) => {
+  res.send('Hello Holberton School!');
+});
+
+// Route for the students page
+app.get('/students', async (req, res) => {
+  const dbPath = process.argv[2]; // Get the database path from command line arguments
+  if (!dbPath) {
+    res.status(400).send('Database path is required');
+    return;
+  }
+
+  try {
+    const studentData = await countStudents(dbPath);
+    res.send(`This is the list of our students\n${studentData}`);
+  } catch (error) {
+    res.status(500).send('Cannot load the database');
   }
 });
 
+// Start the server
 app.listen(port, () => {
-  console.log(`Server is running on http://127.0.0.1:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
 
 module.exports = app;
