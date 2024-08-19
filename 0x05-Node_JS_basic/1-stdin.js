@@ -1,18 +1,18 @@
-// Using Process STDIN
-// Display the initial message
-process.stdout.write('Welcome to Holberton School, what is your name?\n');
+// 1-stdin.js
 
-// Handle readable event to process user input
-process.stdin.on('readable', () => {
-  const input = process.stdin.read(); // Read from the input buffer
+// Display the welcome message
+console.log('Welcome to Holberton School, what is your name?');
 
-  if (input !== null) { // Check if there is any input
-    const name = input.toString().trim(); // Convert input to string and trim whitespace
-    process.stdout.write(`Your name is: ${name}\n`);
-  }
+// Capture user input from stdin
+process.stdin.on('data', (data) => {
+  const input = data.toString().trim();  // Convert the input buffer to a string and trim any whitespace
+  console.log(`Your name is: ${input}`);  // Display the user's name
+
+  // Close the stdin stream and exit the program
+  process.stdin.end();
 });
 
-// Handle end of input stream
+// When the stdin stream ends, display the closing message
 process.stdin.on('end', () => {
-  process.stdout.write('This important software is now closing\n');
+  console.log('This important software is now closing');
 });
