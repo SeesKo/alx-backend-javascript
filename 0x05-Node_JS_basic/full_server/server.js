@@ -1,28 +1,21 @@
+// Miniature Express server
 import express from 'express';
-import bodyParser from 'body-parser';
-import indexRoutes from './routes/index';
+import router from './routes/index';
 
 const app = express();
-const PORT = 1245;
+const port = 1245;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Set up middleware to use JSON body parser
+app.use(express.json());
 
-// Routes
-app.use('/', indexRoutes);
+// Define the route
+app.use('/', router);
 
-// Start server
-const databasePath = process.argv[2];
-if (!databasePath) {
-  console.error('Error: Database path is required');
-  process.exit(1);
-}
-
+const [, , databasePath] = process.argv;
 app.locals.databasePath = databasePath;
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
 });
 
 export default app;

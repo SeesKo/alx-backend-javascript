@@ -1,13 +1,13 @@
 // Reads database asynchronously and returns a promise
-import { promises as fsPromises } from 'fs';
+const fs = require('fs').promises;
 
-async function readDatabase(path) {
+export async function readDatabase(filePath) {
   try {
-    const data = await fsPromises.readFile(path, 'utf8');
+    const data = await fs.readFile(filePath, 'utf8');
     const lines = data.trim().split('\n').filter((line) => line.trim() !== '');
-
     const header = lines[0].split(',');
     const rows = lines.slice(1);
+
     const indexFirstname = header.indexOf('firstname');
     const indexField = header.indexOf('field');
 
