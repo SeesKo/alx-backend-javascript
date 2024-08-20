@@ -1,5 +1,5 @@
 // Reads database asynchronously and returns a promise
-import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 
 async function readDatabase(path) {
   try {
