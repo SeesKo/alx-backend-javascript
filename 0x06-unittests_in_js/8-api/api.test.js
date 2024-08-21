@@ -1,6 +1,5 @@
 const request = require('request');
 const { expect } = require('chai');
-const app = require('./api'); // Import app to start server
 
 describe('Index page', () => {
   const baseUrl = 'http://localhost:7865';
